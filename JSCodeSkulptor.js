@@ -42,6 +42,9 @@ function print() {
         var args = (arguments.length > 1) ? Array.prototype.join.call(arguments, " ") : arguments[0];
         console.log(args);
     }
+    else {
+        console.log("");
+    }
 }
 
 Array.prototype.make = function (size, value) {
@@ -77,8 +80,15 @@ Random.prototype.random = function () {
     return Math.random();
 };
 
-Random.prototype.randrange = function (start, stop) {
-    return Math.floor(Math.random() * ((stop - 1) - start + 1)) + start;
+Random.prototype.randrange = function (start, stop, step) {
+    if (stop === undefined) {
+        stop = start;
+        start = 0;
+    }
+    if (step === undefined) {
+        step = 1;
+    }
+    return Math.floor(Math.random() * (stop - start) / step) * step + start;
 };
 
 Random.prototype.shuffle = function (a_list) {
@@ -94,6 +104,14 @@ Random.prototype.shuffle = function (a_list) {
     }
     return a_list;
 };
+
+Random.prototype.choice = function (array) {
+    return array[Math.floor(Math.random()*array.length)];
+};
+
+Random.prototype.randint = function (first_value, last_value) {
+    return Math.round(Math.random() * (last_value - first_value) + first_value);
+}
 
 // Timer------------------------------------------------------------------------
 function Timer(interval, handler) {
