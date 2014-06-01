@@ -61,6 +61,15 @@ Object.prototype.set_text = function(text) {
   this.innerHTML = text;
 };
 
+// Math-------------------------------------------------------------------------
+Math.radians = function (value) {
+    return value * Math.PI / 180;
+}
+
+Math.degrees = function (value) {
+    return value / Math.PI * 180;
+};
+
 // Random-----------------------------------------------------------------------
 function Random() {}
 
