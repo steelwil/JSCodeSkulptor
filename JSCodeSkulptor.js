@@ -49,7 +49,7 @@ function print() {
     }
 }
 
-Array.prototype.make = function (size, value) {
+Array.make = function (size, value) {
     if (value === undefined) {
         value = 0;
     }
