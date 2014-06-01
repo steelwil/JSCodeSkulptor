@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Undefined</title>
+        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
+    </head>
+<body>
+    <div id="leftPanel" style="left:0; top:0; width:245px; height: 400px; float:left;"></div>
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000; background-color:black;"></canvas>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+// Code Skulptor code below
+// CodeSkulptor runs Python programs in your browser.
+
+// CodeSkulptor runs in Chrome 18+, Firefox 11+, and Safari 6+.
+// Some features may work in other browsers, but do not expect
+// full functionality.  It does NOT run in Internet Explorer.
+
+
+var message = "Welcome!";
+
+// Handler for mouse click
+function click() {
+    message = "Good job!";
+}
+
+// Handler to draw on canvas
+function draw(canvas) {
+    canvas.draw_text(message, [50,112], 48, "Red");
+}
+
+// Create a frame and assign callbacks to event handlers
+var frame = new simplegui.create_frame("Home", 300, 200);
+frame.add_button("Click me", click);
+frame.set_draw_handler(draw);
+
+// Start the frame animation
+frame.start();
+
+// Code Skulptor code above
+////////////////////////////////////////////////////////////////////////////////
+</script>
+
+</body>
+</html>
+
