@@ -114,6 +114,7 @@ function Frame(width, height) {
         Frame.canvas.element = c;
         c.width = width;
         c.height = height;
+        Frame.canvas.element.color = "Black";
     }
 }
 
@@ -175,7 +176,6 @@ Frame.prototype.mouse_click_handler = function (e) {
     Frame.mouse_click_up(pos);
 };
 
-
 Frame.prototype.set_mousedrag_handler = function (handler) {
     Frame.mouse_drag_handler = handler;
     Frame.canvas.element.addEventListener('mousemove', this.mouse_move_handler, true);
@@ -196,12 +196,9 @@ Frame.prototype.touch_move_handler = function (e) {
     Frame.mouse_drag_handler(pos);
 };
 
-
-
 Frame.prototype.mouse_down_handler = function (e) {
     Frame.mousedrag = true;
 };
-
 
 Frame.prototype.start = function () {
     // does nothing
