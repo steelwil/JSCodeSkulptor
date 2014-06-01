@@ -9,7 +9,7 @@ s/True/true/g
 s/False/false/g
 s/self/this/g
 s/def /function /g
-s/^#/\/\/g
+s/^#/\/\//g
 s/# /\/\/ /g
 s/):/) {/g
 s/str(/String(/g
