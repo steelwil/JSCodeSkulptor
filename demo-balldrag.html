@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Undefined</title>
+        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
+    </head>
+<body>
+    <div id="leftPanel" style="left:0; top:0; width:245px; height: 400px; float:left;"></div>
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000; background-color:black;"></canvas>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+// Code Skulptor code below
+// Mouseclick Handlers
+// Ball Movement
+
+
+// This program allows the user to move a circle around the
+//    canvas using the mouse.
+
+
+// Global Variables
+
+var canvas_width = 300;
+var canvas_height = 300;
+var point = [canvas_width / 2, canvas_height / 2];
+
+// Event Handlers
+
+function draw(canvas) {
+    canvas.draw_circle(point, 20, 5, "White", "Red");
+}
+
+// This is the handler for mouse drag events. Note that it
+//    must take one parameter, a tuple of the position of the
+//    mouse click.
+function drag(pos) {
+    point = pos;
+}
+
+// Frame
+
+var frame = new simplegui.create_frame("Ball Drag", canvas_width, canvas_height);
+
+// Register Event Handlers
+
+frame.set_draw_handler(draw);
+// This is necessary to tell the program what to do with
+//    mouse drag events
+frame.set_mousedrag_handler(drag);
+
+// Start
+frame.start();
+// Code Skulptor code above
+////////////////////////////////////////////////////////////////////////////////
+</script>
+
+</body>
+</html>
