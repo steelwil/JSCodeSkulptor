@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Undefined</title>
+        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
+    </head>
+<body>
+    <div id="leftPanel" style="left:0; top:0; width:245px; height: 400px; float:left;"></div>
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000; background-color:black;"></canvas>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+// Code Skulptor code below
+// More Operations
+// Math Module
+
+
+// The Math Module contains many useful functions and
+//    constants used in Math.matical expressions. To use the
+//    Math Module, it must be imported first.
+
+
+// Here are some examples of the functions in the Math Module.
+//    For explanations of what they do, please check the
+//    documentation. Feel free to change these ones around
+//    and try more of them from the module.
+
+print ("Ex. 1:", Math.ceil(.2), Math.ceil(-1.4));
+print ("Ex. 2:", Math.floor(4.9999), Math.floor(-3.2));
+// Note: Math.pow() is the same as the '**' symbol
+print ("Ex. 3:", Math.pow(3, 4), "3 ** 4 is not supported in JS");
+print ("Ex. 4:", Math.abs(-5), Math.abs(5));
+print ("Ex. 5:", Math.sqrt(9), Math.sqrt(2));
+// Note: all trig function parameters are in radians
+print ("Ex. 6:", Math.sin(0), Math.sin(4.5));
+print ("Ex. 7:", Math.radians(180), Math.degrees(3.1415926));
+print ("");
+
+// The Math Module also contains important constants
+// Note: Because they are constants, they do not require ()'s
+print ("Pi:", Math.PI);
+print ("e:", Math.E);
+
+
+print ("--------");
+
+
+// Here are some sample functions involving the Math Module
+
+// Pythagorean Theorem (finding the hypotenuse of a right triangle)
+
+function pythagorean(a, b) {
+    var c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+    return c;
+}
+
+print ("Pythagorean Theorem:", pythagorean(3, 4));
+
+// Area of a circle
+
+function area_of_circle(radius) {
+    var area = Math.PI * Math.pow(radius, 2);
+    return area;
+}
+
+print ("Area of Circle:", area_of_circle(3.4));
+
+// Radioactive decay (approximation)
+
+function radioactive_decay(initial_amount, half_life, time_elapsed) {
+    var x = -0.693 * time_elapsed / half_life;
+    var amount = initial_amount * Math.exp(x);
+    return amount;
+}
+
+print ("Radioactive Decay:", radioactive_decay(100, 17.9, 10));
+// Code Skulptor code above
+////////////////////////////////////////////////////////////////////////////////
+</script>
+
+</body>
+</html>
