@@ -74,13 +74,13 @@ Math.degrees = function (value) {
 };
 
 // Random-----------------------------------------------------------------------
-function Random() {}
+function random() {}
 
-Random.prototype.random = function () {
+random.random = function () {
     return Math.random();
 };
 
-Random.prototype.randrange = function (start, stop, step) {
+random.randrange = function (start, stop, step) {
     if (stop === undefined) {
         stop = start;
         start = 0;
@@ -91,7 +91,7 @@ Random.prototype.randrange = function (start, stop, step) {
     return Math.floor(Math.random() * (stop - start) / step) * step + start;
 };
 
-Random.prototype.shuffle = function (a_list) {
+random.shuffle = function (a_list) {
     // Fisher-Yates shuffle
     var i, j, tmp = 0;
     for (i = 1; i < a_list.length; i++) {
@@ -105,11 +105,11 @@ Random.prototype.shuffle = function (a_list) {
     return a_list;
 };
 
-Random.prototype.choice = function (array) {
+random.choice = function (array) {
     return array[Math.floor(Math.random()*array.length)];
 };
 
-Random.prototype.randint = function (first_value, last_value) {
+random.randint = function (first_value, last_value) {
     return Math.round(Math.random() * (last_value - first_value) + first_value);
 }
 
@@ -383,4 +383,3 @@ Simplegui.prototype.create_timer = function (ms, handler) {
 
 // Global variables-------------------------------------------------------------
 var simplegui = new Simplegui();
-var random = new Random();
