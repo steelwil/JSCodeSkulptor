@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Undefined</title>
+        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
+    </head>
+<body>
+    <div id="leftPanel" style="left:0; top:0; width:245px; height: 400px; float:left;"></div>
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000; background-color:black;"></canvas>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+// Code Skulptor code below
+// Canvas and Drawing
+// Structure
+
+
+// The draw handler allows the user to draw things on the
+//    canvas. Make sure you read all the way to the end of the
+//    program to find out how to register a function as the
+//    draw handler.
+
+
+// The draw method is a typeof of event handler. It takes
+//    exactly one parameter, commonly called the canvas. The
+//    canvas can be passed as a parameter to other methods,
+//    if needed.
+
+function draw(canvas) {
+    // The draw handler runs about 60 times each second.
+    // Uncomment the next line to see.
+    //print ("hi");
+
+    // Text can also be drawn on the canvas using the
+    //    draw_text() method of the canvas.
+    var message = "Hello awesome person!";
+    var point = [50, 100]; // The point is the lower left-hand corner of the text
+    var text_size = 20;
+    var color = "Lime";
+    canvas.draw_text(message, point, text_size, color);
+    canvas.draw_text('How are you today?', [150, 200], 30, "Magenta");
+
+    // Notice that the first coordinate of the point gets bigger
+    //    as you go to the right, and the second coordinate of
+    //    the point gets bigger as you go down.
+    canvas.draw_text("Hi", [25, 225], 20, "Red");
+    canvas.draw_text("Hi", [75, 225], 20, "Blue");
+    canvas.draw_text("Hi", [25, 275], 20, "Yellow");
+    canvas.draw_text("Hi", [75, 275], 20, "Green");
+
+    // Text can also go off the screen
+    canvas.draw_text("You are so nice!      She's so annoying...", [300, 50], 20, "Silver");
+}
+
+function other_handler(canvas) {
+    canvas.draw_text("Yay! You found me!", [100, 170], 20, "Aqua");
+}
+
+function wrong_handler() {
+    pass;
+}
+
+// Frame
+
+var frame = new simplegui.create_frame("Draw", 500, 300);
+
+// Register Event Handlers
+
+// This is how to register the draw handler. Uncomment the
+//    one below it to try a different draw handler.
+frame.set_draw_handler(draw);
+//frame.set_draw_handler(other_handler)
+// An error will occur if you assign the draw handler to
+//    a function with the wrong parameters
+//frame.set_draw_handler(wrong_handler)
+
+// Remember to start the frame! Good job!
+frame.start();
+// Code Skulptor code above
+////////////////////////////////////////////////////////////////////////////////
+</script>
+
+</body>
+</html>
