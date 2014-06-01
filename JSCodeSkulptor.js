@@ -74,8 +74,6 @@ Math.degrees = function (value) {
 };
 
 // Random-----------------------------------------------------------------------
-function random() {}
-
 random.random = function () {
     return Math.random();
 };
