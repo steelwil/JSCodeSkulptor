@@ -1,4 +1,4 @@
 JSCodeSkulptor
 ==============
 
-This is a javascript module that emulates the codeskulptor API for easy porting codeskulptor projects to javascript
+This is a JavaScript module that emulates the CodeSkulptor API for easy porting http://www.codeskulptor.org/ projects to JavaScript.
