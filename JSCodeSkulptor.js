@@ -20,6 +20,9 @@
 
 //"use strict"; // uncomment for debugging (chrome does not like const)
 // some helper / convenience functions
+function pass() {
+    return;
+}
 
 function range(start, stop, step) {
     if (stop === undefined) {
@@ -111,7 +114,7 @@ random.choice = function (array) {
 
 random.randint = function (first_value, last_value) {
     return Math.round(Math.random() * (last_value - first_value) + first_value);
-}
+};
 
 // Timer------------------------------------------------------------------------
 function Timer(interval, handler) {
