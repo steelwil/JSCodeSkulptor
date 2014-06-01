@@ -262,6 +262,9 @@ Canvas.prototype.draw_line = function (fromPos, toPos, width, color) {
 };
 
 Canvas.prototype.draw_circle = function (pos, r, line_width, line_color, fill_color) {
+    if (fill_color === undefined) {
+        fill_color = "Black";
+    }
     this.ctx.beginPath();
     this.ctx.arc(pos[0], pos[1], r, 0, Math.PI * 2);
     this.ctx.fillStyle = fill_color;
