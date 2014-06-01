@@ -44,8 +44,7 @@ function print() {
     if (arguments.length > 0) {
         var args = (arguments.length > 1) ? Array.prototype.join.call(arguments, " ") : arguments[0];
         console.log(args);
-    }
-    else {
+    } else {
         console.log("");
     }
 }
@@ -63,14 +62,14 @@ Array.prototype.make = function (size, value) {
     return array;
 };
 
-Object.prototype.set_text = function(text) {
-  this.innerHTML = text;
+Object.prototype.set_text = function (text) {
+    this.innerHTML = text;
 };
 
 // Math-------------------------------------------------------------------------
 Math.radians = function (value) {
     return value * Math.PI / 180;
-}
+};
 
 Math.degrees = function (value) {
     return value / Math.PI * 180;
@@ -109,7 +108,7 @@ random.shuffle = function (a_list) {
 };
 
 random.choice = function (array) {
-    return array[Math.floor(Math.random()*array.length)];
+    return array[Math.floor(Math.random() * array.length)];
 };
 
 random.randint = function (first_value, last_value) {
@@ -203,7 +202,9 @@ Frame.prototype.set_mouseclick_handler = function (handler) {
 Frame.prototype.mouse_click_handler = function (e) {
     Frame.mousedrag = false;
     var pos = [e.clientX - Frame.canvas.offsetLeft, e.clientY - Frame.canvas.offsetTop];
-    Frame.mouse_click_up(pos);
+    if (Frame.mouse_click_up !== null) {
+        Frame.mouse_click_up(pos);
+    }
 };
 
 Frame.prototype.set_mousedrag_handler = function (handler) {
@@ -211,6 +212,9 @@ Frame.prototype.set_mousedrag_handler = function (handler) {
     Frame.canvas.element.addEventListener('mousemove', this.mouse_move_handler, true);
     Frame.canvas.element.addEventListener("touchmove", this.touch_move_handler, true);
     Frame.canvas.element.addEventListener('mousedown', this.mouse_down_handler, true);
+    if (Frame.mouse_click_up === null) {
+        Frame.canvas.element.addEventListener('mouseup', this.mouse_click_handler, true);
+    }
 };
 
 Frame.prototype.mouse_move_handler = function (e) {
@@ -244,7 +248,7 @@ Frame.prototype.get_canvas_textwidth = function (text, size, face) {
     }
     Frame.canvas.ctx.font = String(size) + "px " + face;
     return Frame.canvas.ctx.measureText(text).width;
-}
+};
 
 // Canvas-----------------------------------------------------------------------
 function Canvas() {
@@ -361,11 +365,61 @@ Sound.prototype.set_volume = function (volume) {
 function Simplegui() {}
 
 Simplegui.prototype.KEY_MAP = {
+    "tab": 9,
+    "pause": 19,
     "left": 37,
-        "right": 39,
-        "up": 38,
-        "down": 40,
-        "space": 32
+    "right": 39,
+    "up": 38,
+    "down": 40,
+    "space": 32,
+    "0": 48,
+    "1": 49,
+    "2": 50,
+    "3": 51,
+    "4": 52,
+    "5": 53,
+    "6": 54,
+    "7": 55,
+    "8": 56,
+    "9": 57,
+    "a": 65,
+    "b": 66,
+    "c": 67,
+    "d": 68,
+    "e": 69,
+    "f": 70,
+    "g": 71,
+    "h": 72,
+    "i": 73,
+    "j": 74,
+    "k": 75,
+    "l": 76,
+    "m": 77,
+    "n": 78,
+    "o": 79,
+    "p": 80,
+    "q": 81,
+    "r": 82,
+    "s": 83,
+    "t": 84,
+    "u": 85,
+    "v": 86,
+    "w": 87,
+    "x": 88,
+    "y": 89,
+    "z": 90,
+    "f1": 112,
+    "f2": 113,
+    "f3": 114,
+    "f4": 115,
+    "f5": 116,
+    "f6": 117,
+    "f7": 118,
+    "f8": 119,
+    "f9": 120,
+    "f10": 121,
+    "f11": 122,
+    "f12": 123
 };
 
 Simplegui.prototype.create_frame = function (text, width, height) {
