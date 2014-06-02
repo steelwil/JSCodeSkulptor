@@ -56,14 +56,14 @@ Array.make = function (size, value) {
 
     var array = [];
     for (var i = 0; i < size; i++) {
-        array.push(value);
+        if (Array.isArray(value)) {
+            array.push(value.slice(0));
+        } else {
+            array.push(value);
+        }
     }
 
     return array;
-};
-
-Object.prototype.set_text = function (text) {
-    this.innerHTML = text;
 };
 
 // Math-------------------------------------------------------------------------
@@ -201,7 +201,7 @@ Frame.prototype.set_mouseclick_handler = function (handler) {
 
 Frame.prototype.mouse_click_handler = function (e) {
     Frame.mousedrag = false;
-    var pos = [e.clientX - Frame.canvas.offsetLeft, e.clientY - Frame.canvas.offsetTop];
+    var pos = [e.clientX - Frame.canvas.element.offsetLeft, e.clientY - Frame.canvas.element.offsetTop];
     if (Frame.mouse_click_up !== null) {
         Frame.mouse_click_up(pos);
     }
