@@ -24,4 +24,5 @@ s/return true/return true;/
 s/Math.pi/Math.PI/g
 s/Math.e/Math.E/g
 s/type/typeof/g
-s/None/null/g'  <$1 >$2
+s/None/null/g
+s/.append/.push/g'  <$1 >$2
