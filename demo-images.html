@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Undefined</title>
+        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
+    </head>
+<body>
+    <div id="leftPanel" style="left:0; top:0; width:245px; height: 400px; float:left;"></div>
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000; background-color:black;"></canvas>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+// Code Skulptor code below
+// Images
+// original: http://www.codeskulptor.org/#examples-more-5_images-backgrounds.py
+// Backgrounds
+
+
+// This program draws two versions of the same image, one of
+//    which has a transparent background.
+
+
+// Global Variables
+
+var canvas_width = 200;
+var canvas_height = 200;
+var image_center = [25, 25];
+var image_size = [50, 50];
+var pos1 = [60, 100];
+var pos2 = [140, 100];
+var white_image = simplegui.load_image("http://commondatastorage.googleapis.com/codeskulptor-assets/week5-triangle.png")
+var clear_image = simplegui.load_image("http://commondatastorage.googleapis.com/codeskulptor-assets/week5-triangle2.png")
+
+// Event Handlers
+
+function draw(canvas) {
+    canvas.draw_image(white_image, image_center, image_size, pos1, image_size);
+    canvas.draw_image(clear_image, image_center, image_size, pos2, image_size);
+}
+
+// Frame
+
+var frame = new simplegui.create_frame("Backgrounds", canvas_width, canvas_height);
+
+// Register Event Handlers
+
+frame.set_draw_handler(draw);
+frame.set_canvas_background("Maroon");
+
+// Start
+frame.start();
+// Code Skulptor code above
+////////////////////////////////////////////////////////////////////////////////
+</script>
+
+</body>
+</html>
+
