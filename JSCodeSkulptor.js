@@ -150,8 +150,10 @@ function Frame(width, height) {
 Frame.drawhandler = null; // why does Frame.prototype.drawhandler not work?
 Frame.canvas = null; // Frame.prototype.canvas does not work
 Frame.mouse_click_up = null;
+Frame.mouse_click_down = null;
 Frame.mouse_drag_handler = null;
 Frame.mousedrag = false;
+Frame.inputs = [];
 
 Frame.prototype.add_button = function (text, button_handler, width) {
     var newButton = document.createElement("button");
@@ -174,6 +176,34 @@ Frame.prototype.add_label = function (text) {
     parent.appendChild(newLabel);
     return newLabel;
 };
+
+Frame.prototype.add_input = function (text, input_handler, width) {
+    var newLabel = document.createElement("label");
+    if (text === '') text = "&nbsp;";
+    newLabel.innerHTML = text;
+    newLabel.style.clear = "left";
+    newLabel.style.cssFloat = "left";
+    var parent = document.getElementById("leftPanel");
+    parent.appendChild(newLabel);
+
+    Frame.mouse_click_down = input_handler;
+    var newInput = document.createElement("input");
+    newInput.addEventListener('keydown', this.keyboard_down_handler);
+    newInput.style.width = String(width) + 'px';
+    newInput.style.clear = "left";
+    newInput.style.cssFloat = "left";
+    newInput.id = "Button" + Frame.inputs.length;
+    print (newInput.id);
+    Frame.inputs.push(input_handler);
+    var parent = document.getElementById("leftPanel");
+    parent.appendChild(newInput);
+};
+
+Frame.prototype.keyboard_down_handler = function (e) {
+    if (e.which == 13) {
+        Frame.inputs[e.target.id.substr(6)](e.target.value);
+    }
+}
 
 Frame.prototype.set_keydown_handler = function (handler) {
     window.addEventListener('keydown', handler, true);
