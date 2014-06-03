@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Undefined</title>
+        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
+    </head>
+<body>
+    <div id="leftPanel" style="left:0; top:0; width:245px; height: 400px; float:left;"></div>
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000; background-color:black;"></canvas>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+// Code Skulptor code below
+// Simple "screensaver" program.
+
+// Import modules
+
+// Global state
+var message = "Python is Fun!";
+var position = [50, 50];
+var width = 500;
+var height = 500;
+var interval = 2000;
+
+// Handler for text box
+function update(text) {
+    message = text;
+}
+
+// Handler for timer
+function tick() {
+    var x = random.randrange(0, width);
+    var y = random.randrange(0, height);
+    position[0] = x;
+    position[1] = y;
+}
+
+// Handler to draw on canvas
+function draw(canvas) {
+    canvas.draw_text(message, position, 36, "Red");
+}
+
+// Create a frame
+var frame = new simplegui.create_frame("Home", width, height);
+
+// Register event handlers
+var text = frame.add_input("Message:", update, 150);
+frame.set_draw_handler(draw);
+var timer = simplegui.create_timer(interval, tick);
+
+// Start the frame animation
+frame.start();
+timer.start();
+// Code Skulptor code above
+////////////////////////////////////////////////////////////////////////////////
+</script>
+
+</body>
+</html>
+
