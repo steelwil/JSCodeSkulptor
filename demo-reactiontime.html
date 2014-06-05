@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Undefined</title>
+        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
+    </head>
+<body>
+    <div id="leftPanel" style="left:0; top:0; width:245px; height: 400px; float:left;"></div>
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000; background-color:black;"></canvas>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+// Code Skulptor code below
+// Timers
+// Reaction Time
+// http://www.codeskulptor.org/#examples-more-3b_timers-reaction_time.py
+
+// This program tests your reaction in milliseconds using a
+//    timer. Notice the uses of start() and stop() methods.
+
+
+// Global Variables
+
+var canvas_width = 200;
+var canvas_height = 200;
+var reaction_time = 0;
+// Used to see if the circle should be drawn
+var started = false;
+var count = 0;
+
+// Event Handlers
+
+function check_start() {
+    count += 1;
+    // This makes sure that the circle won't be drawn for at
+    //    least one second after starting the frame or clicking
+    //    the restart button.
+    if (count > 10)
+    {
+        // This increases the likelihood of starting and ensures
+        //    that the game will start within a time limit.
+        if (count / 500.0 > random.random()) {
+            started = true;
+            reaction_timer.start();
+            circle_timer.stop();
+        }
+    }
+}
+
+function increment() {
+    reaction_time += 1;
+}
+
+function stop_button() {
+    if (started) {
+        reaction_timer.stop();
+        print ("Your reaction time was", reaction_time, "milliseconds");
+        output.innerHTML = "Your reaction time was " + String(reaction_time) + " milliseconds"
+    }
+}
+
+function draw(canvas) {
+    if (started) {
+        canvas.draw_circle([canvas_width / 2, canvas_height / 2], 60, 2, "Red", "Red")
+    }
+}
+
+function restart() {
+    started = false;
+    count = 0;
+    reaction_time = 0;
+    output.innerHTML = ""
+    circle_timer.start();
+}
+
+
+// Frame
+
+var frame = new simplegui.create_frame("Reaction Time", canvas_width, canvas_height);
+
+// Register Event Handlers
+
+frame.set_draw_handler(draw);
+
+// By the way, these are labels. You can check the docs for
+//    more info.
+var label = frame.add_label("Get ready...");
+frame.add_label("Press 'stop' when the red circle appears.");
+
+frame.add_button("Stop", stop_button, 75);
+frame.add_button("Restart", restart, 75);
+
+var output = frame.add_label("");
+
+// Note that the timers do not have the same name or purpose
+var circle_timer = simplegui.create_timer(100, check_start);
+var reaction_timer = simplegui.create_timer(1, increment);
+
+// Start Frame and circle_timer
+frame.start();
+circle_timer.start();
+// Code Skulptor code above
+////////////////////////////////////////////////////////////////////////////////
+</script>
+
+</body>
+</html>
+
