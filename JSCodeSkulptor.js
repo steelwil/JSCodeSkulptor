@@ -49,7 +49,7 @@ function print() {
     }
 }
 
-Array.make = function (size, value) {
+Array.create = function (size, value) {
     if (value === undefined) {
         value = 0;
     }
@@ -195,7 +195,7 @@ Frame.prototype.add_input = function (text, input_handler, width) {
     newInput.id = "Button" + Frame.inputs.length;
     print (newInput.id);
     Frame.inputs.push(input_handler);
-    var parent = document.getElementById("leftPanel");
+    parent = document.getElementById("leftPanel");
     parent.appendChild(newInput);
 };
 
@@ -203,7 +203,7 @@ Frame.prototype.keyboard_down_handler = function (e) {
     if (e.which == 13) {
         Frame.inputs[e.target.id.substr(6)](e.target.value);
     }
-}
+};
 
 Frame.prototype.set_keydown_handler = function (handler) {
     window.addEventListener('keydown', handler, true);
@@ -213,9 +213,12 @@ Frame.prototype.set_keyup_handler = function (handler) {
     window.addEventListener('keyup', handler, true);
 };
 
-Frame.prototype.set_draw_handler = function (handler) {
+Frame.prototype.set_draw_handler = function (handler, fps) {
+    if (fps === undefined) {
+        fps = 60;
+    }
     Frame.drawhandler = handler;
-    setInterval(this.draw_handler, 1000 / 60); // 60 fps
+    setInterval(this.draw_handler, 1000 / fps); // default 60 fps
 };
 
 Frame.prototype.draw_handler = function () {
