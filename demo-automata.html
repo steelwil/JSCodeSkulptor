@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Undefined</title>
+        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
+    </head>
+<body>
+    <div id="leftPanel" style="left:0; top:0; width:245px; height: 400px; float:left;"></div>
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000; background-color:black;"></canvas>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+// Code Skulptor code below
+// Ported from http://www.codeskulptor.org/#demos-automata.py
+var ring_size = 29;
+var balls = [];
+for (var i = 0; i < ring_size + 3; i++) balls[i] = random.randrange(3)%2;
+var rules = [];
+for (var i = 0; i < ring_size + 3; i++) rules[i] = random.randrange(3)%2;
+var cur_rule = 0;
+for (var i = ring_size+2; i < ring_size - 3; i--) { cur_rule = cur_rule * 2 + balls[i]; }
+var colour = ['#440000', '#00FF00'];
+var cur_angle = 0;
+var inner_rad = 40;
+var init_rad = Math.sin(Math.radians(180/ring_size)) * inner_rad;
+var ratio = 1.0075;
+
+// timer_event
+function add_ball() {
+    cur_rule = (cur_rule * 2 + balls[ring_size - 3]) % 32;
+    cur_angle = (cur_angle + 360/ring_size) % 360;
+    balls.unshift(rules[cur_rule]);
+    if (balls.length > 300) balls.pop();
+}
+
+// button handlers
+function new_rule() {
+    for (var i = 0; i < ring_size + 3; i++) rules[i] = random.randrange(3)%2;
+}
+
+
+// Handler to draw on canvas
+function draw(canvas) {
+    for (var i = 0; i < balls.length; i++) {
+        var ball_ratio = Math.pow(ratio, i);
+        var ball_range = inner_rad * ball_ratio;
+        var ball_radius = init_rad * ball_ratio;
+        var x = 250 + ball_range * Math.sin(Math.radians(cur_angle - 360/ring_size * i));
+        var y = 250 + ball_range * Math.cos(Math.radians(cur_angle - 360/ring_size * i));
+        canvas.draw_circle([x, y], ball_radius-1, 1, colour[balls[i]], colour[balls[i]]);
+    }
+}
+
+// Create a frame and assign callbacks to event handlers
+var frame = new simplegui.create_frame("Home", 500, 500);
+frame.set_draw_handler(draw);
+var add_timer = simplegui.create_timer(10, add_ball);
+frame.add_button('New Rule', new_rule, 100);
+
+// Start the frame animation
+frame.start();
+add_timer.start();
+// Code Skulptor code above
+////////////////////////////////////////////////////////////////////////////////
+</script>
+
+</body>
+</html>
