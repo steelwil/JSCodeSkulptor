@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Undefined</title>
+        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
+    </head>
+<body>
+    <div id="leftPanel" style="left:0; top:0; width:245px; height: 400px; float:left;"></div>
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000; background-color:black;"></canvas>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+// Code Skulptor code below
+// Lists
+// Rainbow Canvas
+
+
+// This is an example of cycling through a list to change the
+//    color of the canvas. Try changing the timer interval to
+//    see what happens.
+
+
+// Global Variables
+
+var canvas_width = 300;
+var canvas_height = 300;
+colors = ["Red", "Orange", "Yellow", "Green", "Blue", "Purple"];
+// Different rainbow colors list (uncomment to use)
+//colors = ["DeepPink", "Red", "DarkOrange", "Yellow", "Lime", "Aqua", "Magenta"];
+var index = 0;
+
+// Event Handlers
+function draw(canvas) {
+    frame.set_canvas_background(colors[index]);
+}
+
+function next_color() {
+    index += 1;
+    // Using modulus ensures that you will never go to an
+    //    invalid index, and also causes the cycle to repeat
+    //    again from the first color when it reaches the end
+    //    of the list.
+    index = index % colors.length;
+}
+
+// Frame and Timer
+var frame = new simplegui.create_frame("Rainbow Canvas", canvas_width, canvas_height);
+timer = simplegui.create_timer(500, next_color);
+
+// Register Event Handlers
+frame.set_draw_handler(draw);
+
+// Start
+frame.start();
+timer.start();
+
+// Code Skulptor code above
+////////////////////////////////////////////////////////////////////////////////
+</script>
+
+</body>
+</html>
