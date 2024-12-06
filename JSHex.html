@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Undefined</title>
+        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
+    </head>
+<body>
+    <div id="leftPanel" style="left:0; top:0; position: relative;"></div>
+    <canvas id="myCanvas" width="600" height="400" style="top: 0; position: relative; margin-left:10px; border:1px solid #000000; background-color:black;"></canvas>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+// Code Skulptor code below
+// ported from http://www.codeskulptor.org/#user33_9XAASuLYWAKOUAp.py
+// Hex game
+//   by Vladimir Cvetkovic (www.pha.jhu.edu/~vladimir)
+//
+// Uses mouse handler to capture moves by human players
+// In addition to having human players, one can choose a computer as an
+//   opponent or pit two computer players against each other
+//  The code implements Monte Carlo based AI) it samples randomly
+//     generated board configurations and assigns score to each empty tile
+//     based on who wins
+// The AI level is proportional to the number of Monte Carlo trials.
+// The number of trials per move is 500 (level 0), 1000 (1), or 2000 (2).
+
+
+// --------------------------------------------------------
+
+//codeskulptor.set_timeout(60); // might need this for MC
+
+// ---------------------------------------------------------
+
+// constants
+
+// MC parameters
+// tuple with the number of MC trials for different levels
+var MC_TRIALS = [5000, 10000, 20000];
+// number of trials per frame
+// too many - the code will slow down or timeout on a slow CPU
+// too few - the code will not run CPU at full power on better machines
+// adjust if (you experience any of these problems
+var trials_per_frame = 100;
+// how important are the opponent moves (e.g., the importance of blocking)
+var alphaMC = 0.5;
+var trials = 0;
+// what is the no of trials for the current AI player
+// in the case we pit two AI's of different level
+var current_max_trials = MC_TRIALS[0]; // must be set to non-zero!!!
+
+// appearance constants
+var CANVAS_SIZE = [900, 520];
+var LINE_COLOR = "black";
+var LINE_WIDTH = 2;
+var EMPTY_COLOR = "#cccccc";
+var RED_COLOR = "red";
+var BLUE_COLOR = "blue";
+var NO_GO_COLOR = "green";
+// win message position (lines 1 and 2) and size
+var W1_POS_Y = CANVAS_SIZE[1] / 2;
+var W2_POS_Y = 3 * CANVAS_SIZE[1] / 4;
+var W2_MESSAGE = "wins!";
+var WINNER_SIZE = CANVAS_SIZE[1] / 5;
+var W_COLOR = "black";
+// size and position for "Next" in upper left corner
+var next_pos = [0, 0];
+var NEXT_SIZE = CANVAS_SIZE[0] / 36;
+var NEXT_COLOR = "black";
+// MC progress messages, position, and size
+var MC1_MESSAGE = "Calculating AI move.";
+var MC2_MESSAGE = "Progress: ";
+var MC_SIZE = 18;
+var MC1_POS = [0, CANVAS_SIZE[1] - 2.5 * MC_SIZE];
+var MC2_POS = [0, CANVAS_SIZE[1] - 1 * MC_SIZE];
+var MC_RIGHT_OFFSET = 20;
+var MC_COLOR = "black";
+// button width
+var BUTTON_W = 120;
+
+// coordinates of the "next" tile
+var NEXT_C = [CANVAS_SIZE[0] / 15, CANVAS_SIZE[1] / 10]; // center
+var NEXT_R = CANVAS_SIZE[0] / 20;
+var NEXT_TILE_C = [];
+for (var i = 0; i < 6; i++) {
+    var a1 = NEXT_C[0] + NEXT_R * Math.cos(i * Math.PI / 3.0);
+    var a2 = NEXT_C[1] + NEXT_R * Math.sin(i * Math.PI / 3.0);
+    NEXT_TILE_C.push([a1, a2]);
+}
+
+// game constants
+// min and max board size allowed
+var MIN_HEX_SIZE = 3;
+var MAX_HEX_SIZE = 13;
+// tile constants
+var EMPTY = 2;
+var RED = 0;
+var BLUE = 1;
+var NO_GO = 3;
+// the initial game size
+var game_size = 7;
+// coloring list/tuple
+var COLOR_LIST = [RED_COLOR, BLUE_COLOR, EMPTY_COLOR, NO_GO_COLOR];
+// name list/tuple
+var PLAYER_NAME = ["Red", "Blue"];
+// whether red and blue are AI or human (start with both humans)
+var HUMAN = false;
+var AI = true;
+var player_type = [HUMAN, HUMAN];
+var AI_NAME = {
+    false: "Human",
+    true: "AI"
+};
+// level at which AI players play; will be set when AI selected
+var AI_level = [0, 0];
+var my_board = null;
+var game_on = false;
+var tile_score = {};
+var empty_tiles = [];
+var winner_name = "";
+
+// coordinates of neighboring tiles on board; used for graph search
+var neighbors = [
+    [1, 0],
+    [1, 1],
+    [0, 1],
+    [-1, 0],
+    [-1, -1],
+    [0, -1]
+];
+
+
+// -----------------------------------------------------------
+
+// some helper functions
+
+// cross product
+function cross(v1, v2) {
+    return v1[0] * v2[1] - v1[1] * v2[0];
+}
+
+// distance between two vectors/points
+function dist(v1, v2) {
+    var aux = 0.0;
+    for (var d = 0; d < 2; d++) {
+        aux += Math.pow((v1[d] - v2[d]), 2);
+    }
+    return Math.sqrt(aux);
+}
+
+// draw text in the canvas center (y coordinate given)
+function draw_text_center(canvas, text, y, size, color) {
+    var x = 0.5 * (CANVAS_SIZE[0] - frame.get_canvas_textwidth(text, size));
+    canvas.draw_text(text, [x, y], size, color);
+}
+
+
+// ---------------------------------------------------------
+// define classes
+// hexboard class
+// graphics tells the constructor to also prepare drawing data
+// meant to be skipped when a board is copied by AI
+function Hexboard(size, graphics) {
+    // check for the size
+    if (size < MIN_HEX_SIZE || size > MAX_HEX_SIZE) {
+        // stop the code if (the size is not appropriate
+        print("Illegal hexboard size. Error!");
+        return;
+    }
+
+    // size2 is the size with the edges
+    this.size2 = size + 2;
+    // get the board and set all tiles empty
+    this.board = Array.create(Math.pow(this.size2, 2), EMPTY);
+    // set the edges properly
+    for (var x = 1; x < size + 1; x++) {
+        // top right and bottom left edges
+        this.board[x] = BLUE;
+        this.board[x + (size + 1) * this.size2] = BLUE;
+        // top left and bottom right edges
+        this.board[x * this.size2] = RED;
+        this.board[x * this.size2 + size + 1] = RED;
+    }
+    // set the corners unplayable
+    this.board[0] = NO_GO;
+    this.board[this.size2 - 1] = NO_GO;
+    this.board[Math.pow(this.size2, 2) - 1] = NO_GO;
+    this.board[this.size2 * (this.size2 - 1)] = NO_GO;
+
+    // next player and the list of moves
+    this.nextp = RED;
+    this.moves = [];
+
+    this.graphics = graphics;
+    if (graphics) {
+        // only if (hexboard created for drawing do this
+        // drawing hoopla
+        // unit vecs
+        var ax = 0.5 * CANVAS_SIZE[0] / size;
+        var ay = 0.5 * CANVAS_SIZE[1] / size;
+        this.avecs = [
+            [ax, ay],
+            [-ax, ay]
+        ];
+        // center of the top tile
+        this.tile0 = [0.5 * CANVAS_SIZE[0], -this.avecs[0][1]];
+
+        // have tile corner positions here
+        // 6 corners ready
+        var tile_c = Array.create(6, null);
+        var aa = 2 * this.avecs[0][0] / 3; // cell size
+        for (var i = 0; i < 6; i++) {
+            tile_c[i] = [aa * Math.cos(i * Math.PI / 3.0) + this.tile0[0],
+            aa * Math.sin(i * Math.PI / 3.0) + this.tile0[1]];
+        }
+
+        // 6 x Math.pow(this.size2, 2)
+        this.tile_cpos = Array.create(Math.pow(this.size2, 2), tile_c);
+        // define tile by tile
+        var tile = 0; // counting tiles
+        for (x = 0; x < this.size2; x++) {
+            for (var y = 0; y < this.size2; y++) {
+                for (i = 0; i < 6; i++) {
+                    this.tile_cpos[tile][i] = tile_c[i].slice(0);
+                }
+                // move to the next tile
+                tile += 1;
+                for (var corner = 0; corner < tile_c.length; corner++) {
+                    for (var d = 0; d < 2; d++) {
+                        tile_c[corner][d] += this.avecs[0][d];
+                    }
+                }
+            }
+            // if we arrive to the end of line do the CR and LF
+            for (corner = 0; corner < tile_c.length; corner++) {
+                for (d = 0; d < 2; d++) {
+                    tile_c[corner][d] -= this.avecs[0][d] * this.size2;
+                    tile_c[corner][d] += this.avecs[1][d];
+                }
+            }
+        }
+    }
+}
+
+//Hexboard.prototype.graphics = null;
+//Hexboard.prototype.tile_cpos = null;
+Hexboard.prototype.board = null;
+Hexboard.prototype.nextp = RED;
+Hexboard.prototype.moves = [];
+Hexboard.prototype.empty_tiles = [];
+//Hexboard.prototype.tile0 = [0, 0];
+
+// copy
+// keep_graphics = true means the drawing info is copied
+// these can be skipped for MC
+Hexboard.prototype.copy = function (keep_graphics) {
+    // first create an empty board
+    var aux = new Hexboard(this.size2 - 2, keep_graphics);
+    // copy important elements
+    aux.board = this.board.slice(0);
+    aux.nextp = this.nextp;
+    aux.moves = this.moves.slice(0);
+    // return the hexboard
+    return aux;
+};
+
+// the list of tiles with a given value
+Hexboard.prototype.such_tiles = function (value) {
+    var aux = [];
+    for (var i = 1; i < Math.pow(this.size2, 2) - 1; i++) {
+        if (this.board[i] == value) {
+            aux.push(i);
+        }
+    }
+    return aux;
+};
+
+// check if (two fields connected by same colored tiles (RED or BLUE)
+Hexboard.prototype.are_connected = function (index1, index2) {
+    if (index1 < 0 || index1 >= Math.pow(this.size2, 2)) {
+        // index1 not well defined (corners not used)
+        print("index1 not well defined");
+        return false;
+    }
+    if (index2 < 0 || index2 >= Math.pow(this.size2, 2)) {
+        // index2 not well defined
+        print("index2 not well defined");
+        return false;
+    }
+    if (this.board[index1] != this.board[index2]) {
+        print("cannot be connected if different color");
+        return false; // cannot be connected if different color
+    }
+    // set of all tiles in this color
+    var same_tiles = this.such_tiles(this.board[index1]).slice(0);
+    var fringe = [index1]; // put first tile on the fringe
+    same_tiles.splice(0, 1); // and take it of the tiles set
+    while (fringe.length > 0) { // while the fringe is not empty
+        if (fringe.indexOf(index2) >= 0) {
+            // index2 can be popped so we finished the search
+            return true;
+        }
+        var node = fringe.pop(); // pop an element from the fringe and expand
+        // node coordinates on the board
+        var nodex = node % this.size2;
+        var nodey = Math.floor(node / this.size2);
+        // iterate over neighbours
+        for (var n = 0; n < neighbors.length; n++) {
+            // move to a neighbour
+            var node2x = nodex + neighbors[n][0];
+            var node2y = nodey + neighbors[n][1];
+            // if the neighbor still on board
+            if (0 <= node2x && node2x < this.size2 && 0 <= node2y && node2y < this.size2) {
+                var node2 = node2x + node2y * this.size2;
+                // if this node not visited yet and of the same type
+                var inx = same_tiles.indexOf(node2);
+                if (inx >= 0) {
+                    // add it to the fringe
+                    // and remove from the set of unexplored nodes
+                    fringe.push(node2);
+                    same_tiles.splice(inx, 1);
+                }
+            }
+        }
+    }
+    return false; // exhausted fringe, so return false
+};
+
+// check if player is the winner
+Hexboard.prototype.is_winner = function (player) {
+    if (player == BLUE) {
+        return this.are_connected(1, Math.pow(this.size2, 2) - 2);
+    } else if (player == RED) {
+        return this.are_connected(this.size2, 2 * this.size2 - 1);
+    } else {
+        print("Invalid player!"); // not valid player
+        return false;
+    }
+};
+
+
+// add tile
+// real game is set to false for MC to speed up things
+Hexboard.prototype.play = function (index, real_game) {
+    if (index < 0 || index >= Math.pow(this.size2, 2)) {
+        print("cannot play outside the board", index);
+        return false; // cannot play outside the board
+    }
+    if (this.board[index] != EMPTY) {
+        print("occupied field", index);
+        return false; // occupied field
+    }
+    this.board[index] = this.nextp; // set the next player' tile
+
+    // check for winner if a real game (not MC test)
+    if (real_game) {
+        if (this.is_winner(this.nextp)) {
+            // stop the game
+            game_on = false;
+            // set the winner name
+            winner_name = (PLAYER_NAME[this.nextp] + " (" + AI_NAME[player_type[this.nextp]] + ")");
+        }
+    }
+
+    this.nextp = 1 - this.nextp; // change turns
+    this.moves.push(index); // update the list of moves
+    return true; // return OK flag
+};
+
+
+// undo a move
+Hexboard.prototype.undo = function () {
+    var no_moves = this.moves.length; // number of moves
+    if (no_moves <= 1) { // can undo only if there are moves played
+        if (no_moves == 1) {
+            // undo the only move; otherwise nothing
+            this.board[this.moves[0]] = EMPTY; // empty the tile
+            this.nextp = RED;
+            this.moves = [];
+        }
+    } else {
+        // more than one move played
+        // empty the last tile
+        this.board[this.moves[no_moves - 1]] = EMPTY;
+        // remove the last move from the list
+        this.moves.pop();
+        if (player_type[1 - this.nextp] == HUMAN) {
+            // if (the previous player a human
+            // remove only last (human) move, but change player
+            this.nextp = 1 - this.nextp;
+        } else {
+            // otherwise two moves are removed (one for AI)
+            this.board[this.moves[no_moves - 2]] = EMPTY;
+            this.moves.pop();
+        }
+    }
+};
+
+
+// mouse click
+Hexboard.prototype.mouse_click = function (pos) {
+    var s_pos = [pos[0] - this.tile0[0], pos[1] - this.tile0[1]];
+    var ij = [cross(s_pos, this.avecs[1]) / cross(this.avecs[0], this.avecs[1]),
+    cross(s_pos, this.avecs[0]) / cross(this.avecs[1], this.avecs[0])];
+    ij = [Math.floor(ij[0] + 0.5), Math.floor(ij[1] + 0.5)];
+    var cc = [ij[0] * this.avecs[0][0] + ij[1] * this.avecs[1][0],
+    ij[0] * this.avecs[0][1] + ij[1] * this.avecs[1][1]]; // assumed center
+    if (dist(cc, s_pos) < 0.5 * this.avecs[0][0]) {
+        // accept only clicks close to the tile center
+        this.play(ij[0] + ij[1] * this.size2, true);
+    }
+};
+
+// drawing
+Hexboard.prototype.draw = function (canvas) {
+    // check that the hexboard is legit for drawing
+    if (!this.graphics) {
+        print("Cannot draw this hexboard");
+        return;
+    }
+    // draw tile by tile
+    for (var i = 0; i < this.size2 * this.size2 - 1; i++) {
+        canvas.draw_polygon(this.tile_cpos[i], LINE_WIDTH, LINE_COLOR, COLOR_LIST[this.board[i]]);
+    }
+
+    if (game_on) {
+        // draw the next tile
+        canvas.draw_polygon(NEXT_TILE_C, LINE_WIDTH, LINE_COLOR, COLOR_LIST[this.nextp]);
+        canvas.draw_text("Next", next_pos, NEXT_SIZE, NEXT_COLOR);
+        // if game_on check if the current player is AI
+        if (player_type[this.nextp] == AI) {
+            // we have to deal with AI
+            // check if we did all the trials
+            if (trials >= current_max_trials) {
+                // if so set trials to zero for the next AI turn
+                trials = 0;
+                // choose a move
+                this.play(chooseMC(), true);
+            } else {
+                // check if just started
+                if (trials === 0) {
+                    // prepare the MC set
+                    empty_tiles = this.such_tiles(EMPTY);
+                    // dictionary counting score for empty tiles
+                    tile_score = {};
+                    for (i = 0; i < empty_tiles.length; i++) {
+                        tile_score[empty_tiles[i]] = 0;
+                    }
+                    // set the number of samplings
+                    current_max_trials = MC_TRIALS[AI_level[this.nextp]];
+                }
+                // in either case do a few MC trial per frame
+                trials += trials_per_frame;
+                canvas.draw_text(MC1_MESSAGE, MC1_POS, MC_SIZE, MC_COLOR);
+                canvas.draw_text(MC2_MESSAGE + String(trials) + "/" + String(current_max_trials),
+                MC2_POS, MC_SIZE, MC_COLOR);
+                // do a single frame MC sampling
+                MCsample(this);
+            }
+        }
+    } else { // game over
+        draw_text_center(canvas, winner_name, W1_POS_Y, WINNER_SIZE, W_COLOR);
+        draw_text_center(canvas, W2_MESSAGE, W2_POS_Y, WINNER_SIZE, W_COLOR);
+    }
+};
+
+// -----------------------------------------------------------------
+// Monte Carlo AIs
+// single frame MC sampling
+function MCsample(hexboard) {
+    // sample trials_per_frame times
+    //trials_per_frame = 1;
+    for (var c = 0; c < trials_per_frame; c++) {
+        random.shuffle(empty_tiles); // play in this order
+        var boardcopy = hexboard.copy(false); // make a copy
+        for (var t = 0; t < empty_tiles.length; t++) {
+            boardcopy.play(empty_tiles[t], false); // play randomly
+        }
+        // once finished check the winner
+        if (boardcopy.is_winner(hexboard.nextp)) {
+            // if AI is the winner
+            for (var i = 0; i < empty_tiles.length; i += 2) {
+                tile_score[empty_tiles[i]] += 1; // good move
+            }
+            for (i = 1; i < empty_tiles.length; i += 2) {
+                // opponent's move: let the opponent play there
+                tile_score[empty_tiles[i]] -= alphaMC;
+            }
+        } else { // AI lost
+            for (i = 0; i < empty_tiles.length; i += 2) {
+                tile_score[empty_tiles[i]] -= 1; // bad move
+            }
+            for (i = 1; i < empty_tiles.length; i += 2) {
+                // opponent's move: block
+                tile_score[empty_tiles[i]] += alphaMC;
+            }
+        }
+    }
+}
+
+// when already finished sampling, this finds the best tile
+function chooseMC() {
+    // the worst possible score
+    var best_score = -(1 + alphaMC) * current_max_trials;
+    var best_tile = [];
+    for (var tile in tile_score) {
+        if (tile_score[tile] >= best_score) {
+            if (tile_score[tile] == best_score) {
+                // if tied
+                best_tile.push(tile);
+            } else { // we found a better tile
+                // update best score
+                best_score = tile_score[tile];
+                best_tile = [tile];
+            }
+        }
+    }
+
+    return random.choice(best_tile); // choose among the best
+}
+
+
+// -----------------------------------------------------------------
+
+// Handler for mouse click
+function click(pos) {
+    if (game_on) { // accept moves only in play
+        if (player_type[my_board.nextp] == HUMAN) { // and if human is to play
+            my_board.mouse_click(pos);
+        }
+    }
+}
+
+// Handler to draw on canvas
+function draw(canvas) {
+    my_board.draw(canvas);
+}
+
+
+// -----------------------------------------------------------------
+
+// more helpers (used by the button handlers)
+
+function new_game() {
+    my_board = new Hexboard(game_size, true);
+    game_on = true;
+    trials = 0; // so MC restarts OK
+}
+
+function undo() {
+    // allow undo only when human is playing
+    if (game_on && player_type[my_board.nextp] == HUMAN) {
+        my_board.undo();
+    }
+}
+
+
+function set_board_size(size) {
+    game_size = size;
+    new_game();
+}
+
+// set the player to be human or AI
+function set_player_type(player, ptype, level) {
+    player_type[player] = ptype;
+    // set to zero to ensure MC restarts correctly
+    trials = 0;
+    var name = AI_NAME[ptype];
+    if (ptype == AI) {
+        // if dealing with AI, put the level in the name
+        name = name + " level " + String(level);
+        // and set the level correctly
+        AI_level[player] = level;
+    }
+    if (player == RED) {
+        Rlabel.innerHTML = "Red: " + name;
+    } else if (player == BLUE) {
+        Blabel.innerHTML = "Blue: " + name;
+    } else {
+        print("Trying to set player type for neither Red or Blue player!");
+        return;
+    }
+}
+
+// --------------------------------------------------------------------------
+
+// button handlers
+
+function set7x7() {
+    set_board_size(7);
+}
+
+function set9x9() {
+    set_board_size(9);
+}
+
+function set11x11() {
+    set_board_size(11);
+}
+
+function setRhuman() {
+    set_player_type(RED, HUMAN, 0);
+}
+
+function setBhuman() {
+    set_player_type(BLUE, HUMAN, 0);
+}
+
+function setRMC0() {
+    set_player_type(RED, AI, 0);
+}
+
+function setRMC1() {
+    set_player_type(RED, AI, 1);
+}
+
+function setRMC2() {
+    set_player_type(RED, AI, 2);
+}
+
+function setBMC0() {
+    set_player_type(BLUE, AI, 0);
+}
+
+function setBMC1() {
+    set_player_type(BLUE, AI, 1);
+}
+
+function setBMC2() {
+    set_player_type(BLUE, AI, 2);
+}
+
+// -----------------------------------------------------------------
+
+// Create a frame and assign callbacks to event handlers
+var frame = new simplegui.create_frame("Hex", CANVAS_SIZE[0], CANVAS_SIZE[1]);
+frame.set_canvas_background(NO_GO_COLOR);
+frame.set_mouseclick_handler(click);
+frame.add_button("New game", new_game, BUTTON_W);
+frame.add_label("");
+frame.add_button("Undo", undo, BUTTON_W);
+frame.add_label("");
+frame.add_label("Board size:");
+frame.add_button("7x7", set7x7, BUTTON_W);
+frame.add_button("9x9", set9x9, BUTTON_W);
+frame.add_button("11x11", set11x11, BUTTON_W);
+frame.add_label("");
+var Rlabel = frame.add_label("Red: " + AI_NAME[player_type[0]]);
+frame.add_button(AI_NAME[HUMAN], setRhuman, BUTTON_W);
+frame.add_button(AI_NAME[AI] + " level 0", setRMC0, BUTTON_W);
+frame.add_button(AI_NAME[AI] + " level 1", setRMC1, BUTTON_W);
+frame.add_button(AI_NAME[AI] + " level 2", setRMC2, BUTTON_W);
+var Blabel = frame.add_label("Blue: " + AI_NAME[player_type[1]]);
+frame.add_button(AI_NAME[HUMAN], setBhuman, BUTTON_W);
+frame.add_button(AI_NAME[AI] + " level 0", setBMC0, BUTTON_W);
+frame.add_button(AI_NAME[AI] + " level 1", setBMC1, BUTTON_W);
+frame.add_button(AI_NAME[AI] + " level 2", setBMC2, BUTTON_W);
+frame.set_draw_handler(draw);
+
+// -----------------------------------------------------------------
+
+// get text positions knowning how wide they appear on canvas
+MC1_POS[0] = [CANVAS_SIZE[0] - MC_RIGHT_OFFSET - frame.get_canvas_textwidth(MC1_MESSAGE, MC_SIZE)];
+MC2_POS[0] = MC1_POS[0];
+next_pos = [NEXT_C[0] - 0.5 * frame.get_canvas_textwidth("Next", NEXT_SIZE),
+NEXT_C[1] + 0.3 * NEXT_SIZE];
+
+// -----------------------------------------------------------------
+
+// start the game
+new_game();
+
+// -----------------------------------------------------------------
+
+// Start the frame animation
+frame.start();
+// Code Skulptor code above
+////////////////////////////////////////////////////////////////////////////////
+
+</script>
+
+</body>
+</html>
