@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Undefined</title>
+        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
+    </head>
+<body>
+    <div id="leftPanel" style="left:0; top:0; width:245px; height: 400px; float:left;"></div>
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000; background-color:black;"></canvas>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+// Code Skulptor code below
+// Ported from https://py2.codeskulptor.org/#examples-more-5_mouseclick_handlers-click_lines.py
+// Mouseclick Handlers
+// Click Lines
+
+
+//  This program allows the user to draw a line between two
+// mouse clicks
+
+// Global Variables
+
+var canvas_width = 300;
+var canvas_height = 300;
+var points = [[canvas_width / 2, canvas_height / 2]];
+
+// Event Handlers
+        
+function draw(canvas) {
+    canvas.draw_polyline(points, 5, "White");
+}
+  
+function reset() {
+    //global points;
+    p = points.pop();;
+    points = [p];
+}
+      
+// This is the handler for mouse click events. Note that it
+// must take one parameter, a tuple of the position of the
+// mouse click.
+function click(pos) {
+    if (pos != points[-1]) {
+        points.push(pos);
+        print("Next point:", pos);
+    }
+}
+    
+// Frame
+
+var frame = simplegui.create_frame("Click Lines", canvas_width, canvas_height);
+
+// Register Event Handlers
+
+frame.set_draw_handler(draw);
+// This is necessary to tell the program what to do with
+// mouse click events
+frame.set_mouseclick_handler(click);
+frame.add_button("Reset", reset);
+
+// Start
+frame.start()
+// Code Skulptor code above
+////////////////////////////////////////////////////////////////////////////////
+</script>
+
+</body>
+</html>
