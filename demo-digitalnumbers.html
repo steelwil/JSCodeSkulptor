@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <title>Undefined</title>
-        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
-    </head>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Undefined</title>
+    <script type="text/javascript" src="JSCodeSkulptor.js"></script>
+</head>
+
 <body>
     <div id="leftPanel" style="left:0; top:0; width:245px; height: 400px; float:left;"></div>
     <canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000; background-color:black;"></canvas>
-<script>
+    <script>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code Skulptor code below
@@ -17,7 +19,7 @@
 // Digital Numbers
 
 
-// This program displays two-digit whole numbers in a manner 
+// This program displays two-digit whole numbers in a manner
 //    similar to a digital clock. What happens if you hit the
 //    decrease button when the number is 0? Why? Where in the
 //    code does that take place?
@@ -34,10 +36,10 @@ var num = 0;
 function draw_num(canvas, num, x, y) {
     // x and y are the top left hand coordinates of the number
     lights = [false, false, false, false, false, false, false];
-    
+
     // There are a total of 6 'lights' or shapes that can be
-    //    'on' (drawn) or 'off' (not drawn). This if-else if ( 
-    //    segment decides which ones should be 'on' (true) 
+    //    'on' (drawn) or 'off' (not drawn). This if-else if (
+    //    segment decides which ones should be 'on' (true)
     //    based on the number given to the function.
     if (num == 0)
         lights = [true, true, true, false, true, true, true];
@@ -59,7 +61,7 @@ function draw_num(canvas, num, x, y) {
         lights = [true, true, true, true, true, true, true];
     else if (num == 9)
         lights = [true, true, true, true, false, true, true];
-    
+
     // This segment draws only the lights that are 'on' (true)
     //    from the above array.
     if (lights[0])
@@ -79,7 +81,7 @@ function draw_num(canvas, num, x, y) {
 }
 
 // Event Handlers
-        
+
 function draw(canvas) {
     // Tens digit
     draw_num(canvas, Math.floor(num / 10), 35, 39);
@@ -106,7 +108,7 @@ function increase_num() {
     num += 1;
     num %= 100;
 }
-    
+
 function decrease_num() {
     num -= 1;
     num = ((num % 100) + 100) % 100; //  num %= 100; (we want the modulo not the remainder)
@@ -130,4 +132,5 @@ frame.start();
 </script>
 
 </body>
+
 </html>
