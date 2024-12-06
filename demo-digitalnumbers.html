@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Undefined</title>
+        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
+    </head>
+<body>
+    <div id="leftPanel" style="left:0; top:0; width:245px; height: 400px; float:left;"></div>
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000; background-color:black;"></canvas>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+// Code Skulptor code below
+// Ported from https://py2.codeskulptor.org/#examples-more-4a_lists-digital_numbers.py
+// Lists
+// Digital Numbers
+
+
+// This program displays two-digit whole numbers in a manner 
+//    similar to a digital clock. What happens if you hit the
+//    decrease button when the number is 0? Why? Where in the
+//    code does that take place?
+
+
+// Global Variables
+
+var canvas_width = 150;
+var canvas_height = 150;
+var num = 0;
+
+// Helper Functions
+
+function draw_num(canvas, num, x, y) {
+    // x and y are the top left hand coordinates of the number
+    lights = [false, false, false, false, false, false, false];
+    
+    // There are a total of 6 'lights' or shapes that can be
+    //    'on' (drawn) or 'off' (not drawn). This if-else if ( 
+    //    segment decides which ones should be 'on' (true) 
+    //    based on the number given to the function.
+    if (num == 0)
+        lights = [true, true, true, false, true, true, true];
+    else if (num == 1)
+        lights = [false, false, true, false, false, false, true];
+    else if (num == 2)
+        lights = [false, true, true, true, true, true, false];
+    else if (num == 3)
+        lights = [false, true, true, true, false, true, true];
+    else if (num == 4)
+        lights = [true, false, true, true, false, false, true];
+    else if (num == 5)
+        lights = [true, true, false, true, false, true, true];
+    else if (num == 6)
+        lights = [true, true, false, true, true, true, true];
+    else if (num == 7)
+        lights = [false, true, true, false, false, false, true];
+    else if (num == 8)
+        lights = [true, true, true, true, true, true, true];
+    else if (num == 9)
+        lights = [true, true, true, true, false, true, true];
+    
+    // This segment draws only the lights that are 'on' (true)
+    //    from the above array.
+    if (lights[0])
+        canvas.draw_polygon([[x, y + 3], [x + 7, y + 10], [x + 7, y + 24], [x, y + 31]], 2, "white");
+    if (lights[1])
+        canvas.draw_polygon([[x + 5, y], [x + 12, y + 7], [x + 26, y + 7], [x + 33, y]], 2, "white");
+    if (lights[2])
+        canvas.draw_polygon([[x + 37, y + 3], [x + 30, y + 10], [x + 30, y + 24], [x + 37, y + 31]], 2, "white");
+    if (lights[3])
+        canvas.draw_polygon([[x + 5, y + 35], [x + 12, y + 40], [x + 26, y + 40], [x + 33, y + 35], (x + 26, y + 30), (x + 12, y + 30)], 2, "white");
+    if (lights[4])
+        canvas.draw_polygon([[x, y + 39], [x + 7, y + 46], [x + 7, y + 60], [x, y + 67]], 2, "white");
+    if (lights[5])
+        canvas.draw_polygon([[x + 5, y + 70], [x + 12, y + 63], [x + 26, y + 63], [x + 33, y + 70]], 2, "white");
+    if (lights[6])
+        canvas.draw_polygon([[x + 37, y + 39], [x + 30, y + 46], [x + 30, y + 60], [x + 37, y + 67]], 2, "white");
+}
+
+// Event Handlers
+        
+function draw(canvas) {
+    // Tens digit
+    draw_num(canvas, Math.floor(num / 10), 35, 39);
+    // Ones digit
+    draw_num(canvas, num % 10, 85, 39);
+}
+
+function num_in(string) {
+    if (isNaN(string) == false) {
+        var n = Number(string);
+        if (n < 100) {
+            num = n;
+        }
+        else {
+            print("Invalid input: Number too large");
+        }
+    }
+    else {
+        print("Invalid input: Not a two digit whole number");
+    }
+}
+
+function increase_num() {
+    num += 1;
+    num %= 100;
+}
+    
+function decrease_num() {
+    num -= 1;
+    num = ((num % 100) + 100) % 100; //  num %= 100; (we want the modulo not the remainder)
+}
+
+// Frame and Timer
+
+var frame = new simplegui.create_frame("Digital Numbers", canvas_width, canvas_height);
+frame.add_input("Enter a two digit whole number:", num_in, 70);
+frame.add_button("Increase", increase_num, 70);
+frame.add_button("Decrease", decrease_num, 70);
+
+// Register Event Handlers
+
+frame.set_draw_handler(draw);
+
+// Start
+frame.start();
+// Code Skulptor code above
+////////////////////////////////////////////////////////////////////////////////
+</script>
+
+</body>
+</html>
