@@ -18,7 +18,7 @@
 
 */
 
-//"use strict"; // uncomment for debugging (chrome does not like const)
+"use strict"; // uncomment for debugging (chrome does not like const)
 // some helper / convenience functions
 function pass() {
     return;
@@ -76,7 +76,7 @@ Math.degrees = function (value) {
 };
 
 // Random-----------------------------------------------------------------------
-function random() {}
+function random() { }
 
 random.random = function () {
     return Math.random();
@@ -193,7 +193,7 @@ Frame.prototype.add_input = function (text, input_handler, width) {
     newInput.style.clear = "left";
     newInput.style.cssFloat = "left";
     newInput.id = "Button" + Frame.inputs.length;
-    print (newInput.id);
+    print(newInput.id);
     Frame.inputs.push(input_handler);
     parent = document.getElementById("leftPanel");
     parent.appendChild(newInput);
@@ -388,6 +388,17 @@ Canvas.prototype.draw_polygon = function (point_list, line_width, line_color, fi
     this.ctx.stroke();
 };
 
+Canvas.prototype.draw_roundRect = function (pos, width, height, radius, line_color, fill_color) {
+    if (fill_color !== undefined) this.ctx.fillStyle = fill_color;
+    this.ctx.strokeStyle = line_color;
+
+    this.ctx.beginPath();
+    this.ctx.roundRect(pos[0], pos[1], width, height, radius);
+
+    if (fill_color !== undefined) this.ctx.fill();
+    this.ctx.stroke();
+};
+
 Canvas.prototype.draw_image = function (image, center_source, width_height_source, center_dest, width_height_dest, angle) {
     var sourceX = center_source[0] - width_height_source[0] / 2;
     var sourceY = center_source[1] - width_height_source[1] / 2;
@@ -438,7 +449,7 @@ Sound.prototype.set_volume = function (volume) {
 };
 
 // Simplegui--------------------------------------------------------------------
-function Simplegui() {}
+function Simplegui() { }
 
 Simplegui.prototype.KEY_MAP = {
     "tab": 9,
