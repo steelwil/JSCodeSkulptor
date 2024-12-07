@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Undefined</title>
+        <script type="text/javascript" src="JSCodeSkulptor.js" ></script>
+    </head>
+<body>
+    <div id="leftPanel" style="left:0; top:0; width:245px; height: 400px; float:left;"></div>
+    <canvas id="myCanvas" width="600" height="400" style="border:1px solid #000000; background-color:black;"></canvas>
+<script>
+
+////////////////////////////////////////////////////////////////////////////////
+// Code Skulptor code below
+// Interactive Drawing
+// Shapes
+
+
+// This is an overview of the shapes that can be drawn on the
+//    canvas. For full details, please look at the documentation.
+//    If you are having issues figuring out which shape is drawn
+//    by which line of code, try commenting some of them out.
+// General notes: It is only acceptable to use [] when
+//    listing points. However, be careful that you match
+//    the number and typeof of () or [] that you are using. Also,
+//    polygons and circles have optional parameters that allow
+//    you to select a fill color.
+
+
+// Global Variables
+
+var canvas_width = 200;
+var canvas_height = 200;
+
+// Event Handlers
+
+function draw(canvas) {
+    canvas.draw_arc([10, 10], 20, 0, Math.PI, 12, 'Green');
+    canvas.draw_arc([20, 30], 30, Math.PI, 2*Math.PI, 12, 'Red');
+    canvas.draw_arc([50, 50], 20, 0.5*Math.PI, 1.5*Math.PI, 5, 'Blue', 'White');
+    canvas.draw_arc([70, 80], 30, 0, 0.5*Math.PI, 10, 'Yellow', 'Orange');
+}
+
+// Frame
+
+var frame = new simplegui.create_frame("Arc", canvas_width, canvas_height);
+
+// Register Event Handlers
+
+frame.set_draw_handler(draw);
+
+// Remember to start the frame
+frame.start();
+// Code Skulptor code above
+////////////////////////////////////////////////////////////////////////////////
+</script>
+
+</body>
+</html>

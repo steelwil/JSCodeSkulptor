@@ -298,12 +298,12 @@ Canvas.prototype.draw_line = function (fromPos, toPos, width, color) {
     this.ctx.stroke();
 };
 
-Canvas.prototype.draw_circle = function (pos, r, line_width, line_color, fill_color) {
+Canvas.prototype.draw_circle = function (pos, radius, line_width, line_color, fill_color) {
     if (fill_color === undefined) {
-        fill_color = "Black";
+        fill_color = "transparent";
     }
     this.ctx.beginPath();
-    this.ctx.arc(pos[0], pos[1], r, 0, Math.PI * 2);
+    this.ctx.arc(pos[0], pos[1], radius, 0, Math.PI * 2);
     this.ctx.fillStyle = fill_color;
     this.ctx.fill();
     this.ctx.lineWidth = line_width;
@@ -311,11 +311,54 @@ Canvas.prototype.draw_circle = function (pos, r, line_width, line_color, fill_co
     this.ctx.stroke();
 };
 
-Canvas.prototype.draw_text = function (text, pos, size, fill) {
+Canvas.prototype.draw_arc = function (pos, radius, start_angle, end_angle, line_width, line_color, fill_color) {
+    if (fill_color === undefined) {
+        fill_color = "transparent";
+    }
+    this.ctx.beginPath();
+    this.ctx.arc(pos[0], pos[1], radius, start_angle, end_angle);
+    this.ctx.fillStyle = fill_color;
+    this.ctx.fill();
+    this.ctx.lineWidth = line_width;
+    this.ctx.strokeStyle = line_color;
+    this.ctx.stroke();
+};
+
+Canvas.prototype.draw_arcTo = function (pos1, pos2, radius, line_width, line_color, fill_color) {
+    if (fill_color === undefined) {
+        fill_color = "transparent";
+    }
+    this.ctx.beginPath();
+    this.ctx.arcTo(pos1[0], pos1[1], pos2[0], pos2[1], radius);
+    this.ctx.fillStyle = fill_color;
+    this.ctx.fill();
+    this.ctx.lineWidth = line_width;
+    this.ctx.strokeStyle = line_color;
+    this.ctx.stroke();
+};
+
+Canvas.prototype.draw_bezier = function (pos1, pos2, x_ending, y_ending, line_width, line_color, fill_color) {
+    if (fill_color === undefined) {
+        fill_color = "transparent";
+    }
+    this.ctx.beginPath();
+    this.ctx.bezierCurve(pos1[0], pos1[1], pos2[0], pos2[1], x_ending, y_ending);
+    this.ctx.fillStyle = fill_color;
+    this.ctx.fill();
+    this.ctx.lineWidth = line_width;
+    this.ctx.strokeStyle = line_color;
+    this.ctx.stroke();
+};
+
+Canvas.prototype.draw_text = function (text, pos, size, fill, font_face) {
+    if (font_face === undefined) {
+        font_face = "serif";
+    }
     this.ctx.fillStyle = fill;
-    this.ctx.font = String(size) + "px serif";
+    this.ctx.font = String(size) + "px " + font_face;
     this.ctx.fillText(text, pos[0], pos[1]);
 };
+
 
 Canvas.prototype.draw_polyline = function (point_list, line_width, line_color) {
     this.ctx.strokeStyle = line_color;
